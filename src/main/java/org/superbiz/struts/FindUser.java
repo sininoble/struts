@@ -16,16 +16,24 @@
  limitations under the License.
  */
 package org.superbiz.struts;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import java.util.Properties;
 
+@Component
 public class FindUser {
 
     private int id;
     private String errorMessage;
     private User user;
+    private UserService userService;
+
+    public FindUser(UserService userService) {
+        this.userService = userService;
+    }
 
     public User getUser() {
         return user;
@@ -51,8 +59,7 @@ public class FindUser {
         this.id = id;
     }
 
-    public String execute() {
-
+    /*public String execute() {
         try {
             UserService service = null;
             Properties props = new Properties();
@@ -61,6 +68,19 @@ public class FindUser {
             Context ctx = new InitialContext(props);
             service = (UserService) ctx.lookup("UserServiceImplLocal");
             this.user = service.find(id);
+        } catch (Exception e) {
+            this.errorMessage = e.getMessage();
+            return "failure";
+        }
+        return "success";
+    }*/
+
+    @Transactional
+    public String execute() {
+
+        try {
+
+            this.user = userService.find(id);
         } catch (Exception e) {
             this.errorMessage = e.getMessage();
             return "failure";

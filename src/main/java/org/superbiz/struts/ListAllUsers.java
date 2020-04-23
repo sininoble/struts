@@ -16,17 +16,25 @@
  limitations under the License.
  */
 package org.superbiz.struts;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import java.util.List;
 import java.util.Properties;
 
+@Component
 public class ListAllUsers {
 
     private int id;
     private String errorMessage;
     private List<User> users;
+    private UserService userService;
+
+    public ListAllUsers(UserService userService) {
+        this.userService = userService;
+    }
 
     public List<User> getUsers() {
         return users;
@@ -52,8 +60,7 @@ public class ListAllUsers {
         this.id = id;
     }
 
-    public String execute() {
-
+    /*public String execute() {
         try {
             UserService service = null;
             Properties props = new Properties();
@@ -62,6 +69,19 @@ public class ListAllUsers {
             Context ctx = new InitialContext(props);
             service = (UserService) ctx.lookup("UserServiceImplLocal");
             this.users = service.findAll();
+        } catch (Exception e) {
+            this.errorMessage = e.getMessage();
+            return "failure";
+        }
+        return "success";
+    }*/
+
+    @Transactional
+    public String execute() {
+
+        try {
+
+            this.users = userService.findAll();
         } catch (Exception e) {
             this.errorMessage = e.getMessage();
             return "failure";
